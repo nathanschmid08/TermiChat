@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <title>TermiChat</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 body {
   margin: 0;
@@ -35,6 +34,11 @@ body {
   align-items: flex-start;
   margin-bottom: 16px;
   width: 100%;
+  animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 .user-container {
   flex-direction: row;
@@ -43,15 +47,17 @@ body {
   flex-direction: row-reverse;
 }
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  margin: 0 10px;
+  margin: 0 12px;
   flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
 }
 .user-avatar {
   background: linear-gradient(135deg, #3a1c71, #d76d77);
@@ -61,59 +67,102 @@ body {
   background: linear-gradient(135deg, #1a2980, #26d0ce);
   color: white;
 }
+.avatar svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
 .message {
   position: relative;
   max-width: 70%;
-  padding: 12px 16px;
-  border-radius: 12px;
+  padding: 14px 18px;
+  border-radius: 18px;
   word-break: break-word;
-}
-.message::before {
-  content: '';
-  position: absolute;
-  top: 12px;
-  width: 12px;
-  height: 12px;
-  transform: rotate(45deg);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  line-height: 1.5;
 }
 .user-message {
-  background: linear-gradient(135deg, #3a1c71, #d76d77);
+  background: linear-gradient(135deg, #4a2c81, #e77d87);
   color: white;
-  border-top-left-radius: 4px;
+  border-bottom-left-radius: 6px;
 }
 .user-message::before {
-  left: -6px;
-  background: #3a1c71;
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -12px;
+  width: 20px;
+  height: 20px;
+  background: #4a2c81;
+  border-radius: 0 0 20px 0;
+  z-index: -1;
 }
 .response-message {
-  background: linear-gradient(135deg, #1a2980, #26d0ce);
+  background: linear-gradient(135deg, #2a3990, #36e0de);
   color: white;
-  border-top-right-radius: 4px;
+  border-bottom-right-radius: 6px;
 }
 .response-message::before {
-  right: -6px;
-  background: #26d0ce;
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: -12px;
+  width: 20px;
+  height: 20px;
+  background: #36e0de;
+  border-radius: 0 0 0 20px;
+  z-index: -1;
 }
 #inputContainer {
   display: flex;
-  border-top: 1px solid #333;
-  padding: 15px 0;
+  padding: 16px 10px;
+  border-top: 1px solid #2a2a2a;
+  position: relative;
+  align-items: center;
+  gap: 10px;
 }
 #commandInput {
   flex: 1;
   border: none;
-  border-radius: 20px;
-  background: #2d2d2d;
+  border-radius: 8px;
+  background: #2a2a2a;
   color: #eee;
-  padding: 12px 18px;
-  font-size: 14px;
+  padding: 12px 16px;
+  font-size: 15px;
   outline: none;
+  transition: all 0.2s ease;
 }
 #commandInput:focus {
-  background: #3d3d3d;
-  box-shadow: 0 0 5px rgba(255,255,255,0.2);
+  background: #333333;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
 }
-</style>
+#sendButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3a1c71, #d76d77);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+#sendButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+#sendButton svg {
+  width: 18px;
+  height: 18px;
+  fill: white;
+}
+.message-time {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-top: 6px;
+  text-align: right;
+}
 </style>
 </head>
 <body>
@@ -121,71 +170,107 @@ body {
   <div id="output"></div>
   <div id="inputContainer">
     <input type="text" id="commandInput" autofocus placeholder="Type a message..." />
+    <div id="sendButton">
+      <svg viewBox="0 0 512 512"><path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480V396.4c0-4 1.5-7.8 4.2-10.7L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z"/></svg>
+    </div>
   </div>
 </div>
 <script>
 const { ipcRenderer } = require("electron");
+
+// Define SVG icons
+const userSvg = `<svg viewBox="0 0 448 512"><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg>`;
+const robotSvg = `<svg viewBox="0 0 640 512"><path d="M320 0c17.7 0 32 14.3 32 32V96H472c39.8 0 72 32.2 72 72V440c0 39.8-32.2 72-72 72H168c-39.8 0-72-32.2-72-72V168c0-39.8 32.2-72 72-72H288V32c0-17.7 14.3-32 32-32zM208 384c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H208zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H304zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H400zM264 256a40 40 0 1 0 -80 0 40 40 0 1 0 80 0zm152 40a40 40 0 1 0 0-80 40 40 0 1 0 0 80zM48 224H64V416H48c-26.5 0-48-21.5-48-48V272c0-26.5 21.5-48 48-48zm544 0c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H576V224h16z"/></svg>`;
+const paperPlaneSvg = `<svg viewBox="0 0 512 512"><path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480V396.4c0-4 1.5-7.8 4.2-10.7L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z"/></svg>`;
+
+// Format the current time
+function getCurrentTime() {
+  const now = new Date();
+  return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("commandInput");
   const output = document.getElementById("output");
+  const sendButton = document.getElementById("sendButton");
+  
+  // Function to handle sending messages
+  async function sendMessage() {
+    const command = input.value.trim();
+    if (command) {
+      // Create user message container and components
+      const userContainer = document.createElement("div");
+      userContainer.className = "message-container user-container";
+      
+      // User avatar
+      const userAvatar = document.createElement("div");
+      userAvatar.className = "avatar user-avatar";
+      userAvatar.innerHTML = userSvg;
+      
+      // User message
+      const userMessage = document.createElement("div");
+      userMessage.className = "message user-message";
+      
+      // Message content
+      const messageContent = document.createElement("div");
+      messageContent.textContent = command;
+      
+      // Message timestamp
+      const timeElement = document.createElement("div");
+      timeElement.className = "message-time";
+      timeElement.textContent = getCurrentTime();
+      
+      userMessage.appendChild(messageContent);
+      userMessage.appendChild(timeElement);
+      userContainer.appendChild(userMessage);
+      userContainer.appendChild(userAvatar);
+      output.appendChild(userContainer);
+      
+      input.value = "";
+      
+      const result = await ipcRenderer.invoke("run-command", command);
+      
+      // Create response container and components
+      const responseContainer = document.createElement("div");
+      responseContainer.className = "message-container response-container";
+      
+      // avatar
+      const responseAvatar = document.createElement("div");
+      responseAvatar.className = "avatar response-avatar";
+      responseAvatar.innerHTML = robotSvg;
+      
+      // Response message
+      const responseMessage = document.createElement("div");
+      responseMessage.className = "message response-message";
+      
+      // Message content
+      const responseContent = document.createElement("div");
+      responseContent.textContent = result;
+      
+      // Message timestamp
+      const responseTime = document.createElement("div");
+      responseTime.className = "message-time";
+      responseTime.textContent = getCurrentTime();
+      
+      responseMessage.appendChild(responseContent);
+      responseMessage.appendChild(responseTime);
+      responseContainer.appendChild(responseMessage);
+      responseContainer.appendChild(responseAvatar);
+      output.appendChild(responseContainer);
+      
+      output.scrollTop = output.scrollHeight;
+    }
+  }
   
   input.addEventListener("keydown", async (e) => {
     if (e.key === "Enter") {
-      const command = input.value.trim();
-      if (command) {
-        // Create user message container and components
-        const userContainer = document.createElement("div");
-        userContainer.className = "message-container user-container";
-        
-        // User avatar
-        const userAvatar = document.createElement("div");
-        userAvatar.className = "avatar user-avatar";
-        const userIcon = document.createElement("i");
-        userIcon.className = "fas fa-user";
-        userAvatar.appendChild(userIcon);
-        
-        // User message
-        const userMessage = document.createElement("div");
-        userMessage.className = "message user-message";
-        userMessage.textContent = command;
-        
-        // Add elements to container
-        userContainer.appendChild(userAvatar);
-        userContainer.appendChild(userMessage);
-        output.appendChild(userContainer);
-        
-        input.value = "";
-        
-        // Get response
-        const result = await ipcRenderer.invoke("run-command", command);
-        
-        // Create response container and components
-        const responseContainer = document.createElement("div");
-        responseContainer.className = "message-container response-container";
-        
-        // Response avatar
-        const responseAvatar = document.createElement("div");
-        responseAvatar.className = "avatar response-avatar";
-        const responseIcon = document.createElement("i");
-        responseIcon.className = "fas fa-robot";
-        responseAvatar.appendChild(responseIcon);
-        
-        // Response message
-        const responseMessage = document.createElement("div");
-        responseMessage.className = "message response-message";
-        responseMessage.textContent = result;
-        
-        // Add elements to container
-        responseContainer.appendChild(responseAvatar);
-        responseContainer.appendChild(responseMessage);
-        output.appendChild(responseContainer);
-        
-        // Scroll to bottom
-        output.scrollTop = output.scrollHeight;
-      }
+      sendMessage();
     }
   });
+  
+  sendButton.addEventListener("click", sendMessage);
 });
+
 </script>
 </body>
 </html>
